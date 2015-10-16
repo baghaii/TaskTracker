@@ -9,13 +9,35 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    ArrayList<String> mItems;
+    ArrayAdapter<String> mItemsAdapter;
+    ListView mLvItems;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        readItems();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mLvItems = (ListView) findViewById(R.id.lvItems);
+        mItems = new ArrayList<String>();
+        mItemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mItems);
+        mLvItems.setAdapter(mItemsAdapter);
+        mItems.add("First Item");
+        mItems.add("Second Item");
+        setUpListViewListener();
     }
 
     @Override
@@ -60,4 +82,45 @@ public class MainActivity extends AppCompatActivity {
 
         notificationManager.notify(0, noti);
     }
+
+    public void addToDoItem(View view) {
+        EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
+        mItemsAdapter.add(etNewItem.getText().toString());
+        etNewItem.setText("");
+        saveItems();
+    }
+
+    public void setUpListViewListener() {
+        mLvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mItems.remove(i);
+                mItemsAdapter.notifyDataSetChanged();
+                saveItems();
+                return true;
+            }
+        });
+    }
+
+    private void readItems() {
+        File filesDir = getFilesDir();
+        File toDoFile = new File(filesDir, "todo.txt");
+        try {
+            mItems = new ArrayList<String>(FileUtils.readLines(toDoFile));
+        } catch (IOException e) {
+            mItems = new ArrayList<String>();
+            e.printStackTrace();
+        }
+    }
+
+    private void saveItems() {
+        File filesDir = getFilesDir();
+        File toDoFile = new File(filesDir, "todo.txt");
+        try {
+            FileUtils.writeLines(toDoFile, mItems);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
