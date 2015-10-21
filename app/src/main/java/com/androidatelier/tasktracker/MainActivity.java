@@ -100,6 +100,20 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        mLvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                editItems(mItems.get(i));
+            }
+        });
+
+    }
+
+    private void editItems(String itemName) {
+        Intent intent = new Intent(this, TaskDetailsActivity.class);
+        intent.putExtra("itemName", itemName);
+        startActivity(intent);
     }
 
     private void readItems() {
