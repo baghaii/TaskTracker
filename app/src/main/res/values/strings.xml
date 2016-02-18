@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Task Tracker</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="notify_option">Notification</string>
+    <string name="add_item_button">Add Item</string>
+    <string name="add_item_text">New Item</string>
+    <string name="activity_task_details_textview_due_date">Due Date</string>
+    <string name="activity_task_details_textview_description">Description</string>
 </resources>

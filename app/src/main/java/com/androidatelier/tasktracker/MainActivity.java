@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> mItems;
     ArrayAdapter<String> mItemsAdapter;
     ListView mLvItems;
+    int mNotiId = 1000;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +41,13 @@ public class MainActivity extends AppCompatActivity {
         mItems.add("First Item");
         mItems.add("Second Item");
         setUpListViewListener();
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
 
@@ -53,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
+        if (id == R.id.action_notify) {
+            createNotification(mLvItems);
+            return true;
+        }
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
@@ -66,27 +75,26 @@ public class MainActivity extends AppCompatActivity {
         // Prepare intent which is triggered if the
         // notification is selected
         Intent intent = new Intent(this, NotificationReceiverActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build notification
         // Actions are just fake
-        Notification noti = new Notification.Builder(this)
+        NotificationCompat.Builder noti = new NotificationCompat.Builder(this)
                 .setContentTitle("New Task")
                 .setContentText("Subject").setSmallIcon(R.drawable.ic_assignment_ind_black_24dp)
                 .setContentIntent(pIntent)
                 .addAction(R.drawable.ic_assignment_turned_in_black_24dp, "Done", pIntent)
-                .addAction(R.drawable.ic_alarm_black_24dp, "Snooze", pIntent).build();
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // hide the notification after its selected
-        noti.flags |= Notification.FLAG_AUTO_CANCEL;
+                .addAction(R.drawable.ic_alarm_black_24dp, "Snooze", pIntent);
 
-        notificationManager.notify(0, noti);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        notificationManager.notify(mNotiId, noti.build());
     }
 
     public void addToDoItem(View view) {
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         mItemsAdapter.add(etNewItem.getText().toString());
-        etNewItem.setText("");
+        etNewItem.setText("New Item");
         saveItems();
     }
 
